@@ -367,6 +367,34 @@ DJISDKNode::publish50HzData(Vehicle* vehicle, RecvContainer recvFrame,
    *       in ENU Frame
    */
     p->local_position_publisher.publish(local_pos);
+
+
+    Telemetry::TypeMap<Telemetry::TOPIC_QUATERNION>::type quat =
+              vehicle->subscribe->getValue<Telemetry::TOPIC_QUATERNION>();
+    tf::Matrix3x3 R_FRD2NED(tf::Quaternion(quat.q1, quat.q2, quat.q3, quat.q0));
+    tf::Matrix3x3 R_FLU2ENU = p->R_ENU2NED.transpose() * R_FRD2NED * p->R_FLU2FRD;
+    tf::Quaternion q_FLU2ENU;
+    R_FLU2ENU.getRotation(q_FLU2ENU);
+
+
+    geometry_msgs::PoseStamped pose;
+    pose.header.frame_id = "local";
+    pose.header.stamp = gps_pos.header.stamp;
+
+    pose.pose.orientation.x =  q_FLU2ENU.getX();
+    pose.pose.orientation.y =  q_FLU2ENU.getY();
+    pose.pose.orientation.z =  q_FLU2ENU.getZ();
+    pose.pose.orientation.w =  q_FLU2ENU.getW();
+
+    pose.pose.position.x = local_pos.point.x;
+    pose.pose.position.y = local_pos.point.y;
+    pose.pose.position.z = local_pos.point.z;
+
+    p->local_pose_publisher.publish(pose);
+
+    p->path.poses.push_back(pose);
+    p->local_path_publisher.publish(p->path);
+
   }
 
   Telemetry::TypeMap<Telemetry::TOPIC_HEIGHT_FUSION>::type fused_height =

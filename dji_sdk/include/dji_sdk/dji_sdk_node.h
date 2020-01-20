@@ -31,6 +31,8 @@
 #include <std_msgs/String.h>
 #include <nmea_msgs/Sentence.h>
 
+#include <nav_msgs/Path.h>
+
 //! msgs
 #include <dji_sdk/Gimbal.h>
 #include <dji_sdk/MobileData.h>
@@ -385,6 +387,9 @@ private:
   ros::Publisher time_sync_gps_utc_publisher;
   ros::Publisher time_sync_fc_utc_publisher;
   ros::Publisher time_sync_pps_source_publisher;
+  //! Local pose and path publisher
+  ros::Publisher local_pose_publisher;
+  ros::Publisher local_path_publisher;
 
 #ifdef ADVANCED_SENSING
   ros::Publisher stereo_240p_front_left_publisher;
@@ -453,6 +458,8 @@ private:
   double current_gps_latitude, current_gps_longitude, current_gps_altitude;
   int current_gps_health;
   bool rtkSupport;
+
+  nav_msgs::Path path;
 };
 
 #endif // DJI_SDK_NODE_MAIN_H

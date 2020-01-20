@@ -309,6 +309,11 @@ DJISDKNode::initPublisher(ros::NodeHandle& nh)
   time_sync_pps_source_publisher =
       nh.advertise<std_msgs::String>("dji_sdk/time_sync_pps_source", 10);
 
+  local_pose_publisher = nh.advertise<geometry_msgs::PoseStamped>("dji_sdk/local_pose", 10);
+  local_path_publisher = nh.advertise<nav_msgs::Path>("dji_sdk/local_path", 10);
+  path.header.stamp=ros::Time::now();
+  path.header.frame_id="local";
+
 #ifdef ADVANCED_SENSING
   stereo_240p_front_left_publisher =
     nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_front_left_images", 10);
